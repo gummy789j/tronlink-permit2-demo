@@ -210,6 +210,33 @@ function toEvmHexSafe(addr: string, tw: unknown): string {
   return a.hex;
 }
 
+function fixSignatureForPermit2(signature: string): string {
+  let sig = signature.startsWith('0x') ? signature.slice(2) : signature;
+  if (sig.length !== 130) {
+    console.error('Invalid signature length:', sig.length);
+    return signature;
+  }
+
+  const r = sig.substring(0, 64);
+  const s = sig.substring(64, 128);
+  let v = parseInt(sig.substring(128, 130), 16);
+
+  console.log('Original v:', v);
+  if (v < 27) {
+    v = v + 27;
+    console.log('Fixed v:', v);
+  }
+
+  if (v !== 27 && v !== 28) {
+    console.error('Invalid v value after fix:', v);
+    v = 27;
+  }
+
+  const vHex = v.toString(16).padStart(2, '0');
+  const fixedSignature = '0x' + r + s + vHex;
+  return fixedSignature;
+}
+
 // Send Permit — parameter format from working example: permitSingle = [[token, amount, expiration, nonce], spender, sigDeadline]
 async function sendPermit() {
   if (!tronWeb) {
@@ -249,7 +276,7 @@ async function sendPermit() {
         type: '((address,uint160,uint48,uint48),address,uint256)',
         value: permitSingle,
       },
-      { type: 'bytes', value: signedPermit.signature },
+      { type: 'bytes', value: fixSignatureForPermit2(signedPermit.signature) },
     ];
 
     const contractAddr = permit2Address.startsWith('T')
