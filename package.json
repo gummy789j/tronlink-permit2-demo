@@ -1,0 +1,20 @@
+{
+  "name": "permit2-demo",
+  "version": "1.0.0",
+  "description": "Permit2 signing demo for TronLink (browser)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "tronweb": "^6.0.4",
+    "viem": "^2.37.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vite": "^6.0.0"
+  }
+}

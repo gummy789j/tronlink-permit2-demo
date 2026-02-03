@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Permit2 Demo - TronLink</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        background: #f8fafc;
+        color: #1e293b;
+        line-height: 1.5;
+      }
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 1.5rem;
+        color: #0f172a;
+      }
+      section {
+        background: #fff;
+        border-radius: 10px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      }
+      section > label:first-child {
+        margin-top: 0;
+      }
+      label {
+        display: block;
+        margin: 1rem 0 0.35rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #475569;
+      }
+      input, select {
+        width: 100%;
+        padding: 0.6rem 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        background: #fff;
+      }
+      input:focus, select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+      }
+      button {
+        width: 100%;
+        padding: 0.65rem 1rem;
+        margin-top: 0.75rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        background: #3b82f6;
+        color: #fff;
+      }
+      button:hover { background: #2563eb; }
+      button:active { background: #1d4ed8; }
+      .row {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      .row button { flex: 1; margin-top: 0; }
+      #status, #txHash {
+        word-break: break-all;
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-top: 0.25rem;
+      }
+      #txHash a {
+        color: #3b82f6;
+        text-decoration: none;
+      }
+      #txHash a:hover {
+        text-decoration: underline;
+      }
+      pre {
+        overflow: auto;
+        max-height: 220px;
+        font-size: 0.75rem;
+        background: #f1f5f9;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin: 0.25rem 0 0;
+        border: 1px solid #e2e8f0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Permit2 Demo (TronLink)</h1>
+    <section>
+      <label>Network</label>
+      <select id="network">
+        <option value="testnet" selected>Testnet</option>
+        <option value="mainnet">Mainnet</option>
+      </select>
+      <label>Permit2 contract address</label>
+      <input type="text" id="permit2Address" placeholder="T... or 0x..." />
+      <label>Owner</label>
+      <input type="text" id="owner" placeholder="Connect wallet to fill" />
+      <button type="button" id="connectWallet">Connect Wallet</button>
+      <label>Token</label>
+      <input type="text" id="token" placeholder="TRC20 token address (T... or 0x...)" />
+      <label>Amount</label>
+      <input type="text" id="amount" value="1000000" />
+      <label>Expiration (deadline, unix timestamp, default: now + 30d)</label>
+      <input type="text" id="expiration" />
+      <label>Spender</label>
+      <input type="text" id="spender" placeholder="Spender address (T... or 0x...)" />
+      <div class="row">
+        <button type="button" id="signPermit">Sign Permit</button>
+        <button type="button" id="sendPermit">Send Permit</button>
+      </div>
+    </section>
+    <section>
+      <label>Status</label>
+      <div id="status">—</div>
+    </section>
+    <section>
+      <label>Signed permit (after Sign Permit)</label>
+      <pre id="signedPermit">—</pre>
+    </section>
+    <section>
+      <label>Transaction hash (after Send Permit)</label>
+      <div id="txHash">—</div>
+    </section>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

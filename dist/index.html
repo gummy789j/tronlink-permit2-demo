@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Permit2 Demo - TronLink</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { font-family: system-ui, sans-serif; max-width: 720px; margin: 0 auto; padding: 1rem; }
+      h1 { font-size: 1.25rem; }
+      label { display: block; margin-top: 0.5rem; font-weight: 500; }
+      input, select, button { width: 100%; padding: 0.5rem; margin-top: 0.25rem; }
+      button { cursor: pointer; margin-top: 0.5rem; }
+      section { margin-top: 1.5rem; padding: 1rem; border: 1px solid #ccc; border-radius: 6px; }
+      pre { overflow: auto; max-height: 240px; font-size: 0.75rem; background: #f5f5f5; padding: 0.5rem; }
+      .row { display: flex; gap: 0.5rem; align-items: center; }
+      .row button { width: auto; }
+      #status, #txHash { word-break: break-all; }
+    </style>
+    <script type="module" crossorigin src="/assets/index-9LQWgM42.js"></script>
+  </head>
+  <body>
+    <h1>Permit2 Demo (TronLink)</h1>
+    <section>
+      <label>Network</label>
+      <select id="network">
+        <option value="testnet" selected>Testnet</option>
+        <option value="mainnet">Mainnet</option>
+      </select>
+      <label>Permit2 contract address</label>
+      <input type="text" id="permit2Address" placeholder="T... or 0x..." />
+      <label>Owner</label>
+      <input type="text" id="owner" placeholder="Connect wallet to fill" />
+      <label>Token</label>
+      <input type="text" id="token" placeholder="TRC20 token address (T... or 0x...)" />
+      <label>Amount</label>
+      <input type="text" id="amount" value="0" />
+      <label>Expiration (deadline, unix timestamp)</label>
+      <input type="text" id="expiration" />
+      <label>Spender</label>
+      <input type="text" id="spender" placeholder="Spender address (T... or 0x...)" />
+      <label>Sig deadline (unix timestamp)</label>
+      <input type="text" id="sigDeadline" />
+      <div class="row">
+        <button type="button" id="connectWallet">Connect Wallet</button>
+        <button type="button" id="signPermit">Sign Permit</button>
+        <button type="button" id="sendPermit">Send Permit</button>
+      </div>
+    </section>
+    <section>
+      <label>Status</label>
+      <div id="status">—</div>
+    </section>
+    <section>
+      <label>Signed permit (after Sign Permit)</label>
+      <pre id="signedPermit">—</pre>
+    </section>
+    <section>
+      <label>Transaction hash (after Send Permit)</label>
+      <div id="txHash">—</div>
+    </section>
+  </body>
+</html>
