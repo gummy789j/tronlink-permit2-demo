@@ -1,16 +1,7 @@
 import { AllowanceTransfer } from './lib/AllowanceTransfer';
 import { Address } from './lib/address';
 import type { PermitSingleWithSignature } from './lib/types';
-
-declare global {
-  interface Window {
-    tronLink?: {
-      ready?: boolean;
-      tronWeb?: unknown;
-      request: (args: { method: string }) => Promise<unknown>;
-    };
-  }
-}
+import { getAllWallets, type TronWalletProvider } from './wallets';
 
 const TESTNET_FULL_HOST = 'https://nile.trongrid.io';
 const MAINNET_FULL_HOST = 'https://api.trongrid.io';
@@ -28,7 +19,6 @@ const TRONSCAN_TESTNET = 'https://nile.tronscan.org/#/transaction';
 const TRONSCAN_MAINNET = 'https://api.tronscan.org/#/transaction';
 
 const SECONDS_PER_DAY = 86400;
-const SECONDS_PER_HOUR = 3600;
 
 function nowPlus30Days(): string {
   return String(Math.floor(Date.now() / 1000) + 30 * SECONDS_PER_DAY);
@@ -104,18 +94,126 @@ amountEl.value = '1000000';
 
 networkEl.addEventListener('change', applyNetworkDefaults);
 
-// Connect Wallet
-async function connectWallet() {
-  if (!window.tronLink) {
-    setStatus('TronLink not found. Please install TronLink extension.');
-    return;
+// Connect Wallet modal
+const walletModalOverlay = document.getElementById(
+  'walletModalOverlay'
+) as HTMLDivElement;
+const walletListEl = document.getElementById('walletList') as HTMLUListElement;
+const walletEmptyEl = document.getElementById(
+  'walletEmpty'
+) as HTMLParagraphElement;
+const walletModalCloseBtn = document.getElementById(
+  'walletModalClose'
+) as HTMLButtonElement;
+
+const ledgerModalOverlay = document.getElementById(
+  'ledgerModalOverlay'
+) as HTMLDivElement;
+const ledgerModalCloseBtn = document.getElementById(
+  'ledgerModalClose'
+) as HTMLButtonElement;
+const ledgerModalSpinner = document.getElementById(
+  'ledgerModalSpinner'
+) as HTMLDivElement;
+const ledgerModalStatus = document.getElementById(
+  'ledgerModalStatus'
+) as HTMLParagraphElement;
+const ledgerModalError = document.getElementById(
+  'ledgerModalError'
+) as HTMLParagraphElement;
+const ledgerModalFallback = document.getElementById(
+  'ledgerModalFallback'
+) as HTMLParagraphElement;
+const ledgerUseTronLinkEl = document.getElementById(
+  'ledgerUseTronLink'
+) as HTMLAnchorElement;
+
+function openLedgerModal() {
+  ledgerModalSpinner.style.display = 'block';
+  ledgerModalStatus.style.display = 'block';
+  ledgerModalStatus.textContent = 'Preparing your Ledger device...';
+  ledgerModalError.style.display = 'none';
+  ledgerModalError.textContent = '';
+  ledgerModalFallback.style.display = 'none';
+  ledgerModalOverlay.classList.add('open');
+  ledgerModalOverlay.setAttribute('aria-hidden', 'false');
+
+  const showNoDevice = () => {
+    ledgerModalSpinner.style.display = 'none';
+    ledgerModalStatus.style.display = 'none';
+    ledgerModalFallback.style.display = 'block';
+  };
+
+  if (typeof navigator !== 'undefined' && (navigator as any).hid) {
+    (navigator as any).hid
+      .requestDevice({ filters: [{ vendorId: 0x2c97 }] })
+      .then((devices: unknown[]) => {
+        if (!devices || devices.length === 0) showNoDevice();
+        else {
+          ledgerModalStatus.textContent = 'Device found. This demo uses TronLink for Ledger.';
+          ledgerModalSpinner.style.display = 'none';
+          setTimeout(showNoDevice, 2000);
+        }
+      })
+      .catch(() => showNoDevice());
+  } else {
+    setTimeout(showNoDevice, 1500);
   }
+}
+
+function closeLedgerModal() {
+  ledgerModalOverlay.classList.remove('open');
+  ledgerModalOverlay.setAttribute('aria-hidden', 'true');
+}
+
+function openLedgerModalFromWalletList() {
+  closeWalletModal();
+  openLedgerModal();
+}
+
+function renderWalletList() {
+  const wallets = getAllWallets();
+  walletListEl.innerHTML = '';
+  walletEmptyEl.style.display = 'none';
+  walletListEl.style.display = 'grid';
+  wallets.forEach((wallet) => {
+    const li = document.createElement('li');
+    li.className = 'wallet-item';
+    li.setAttribute('data-wallet-id', wallet.id);
+    li.innerHTML = `<span class="wallet-item-icon">${wallet.icon}</span><span class="wallet-item-name">${wallet.name}</span>`;
+    li.addEventListener('click', () => connectWithWallet(wallet));
+    walletListEl.appendChild(li);
+  });
+}
+
+function openWalletModal() {
+  renderWalletList();
+  walletModalOverlay.classList.add('open');
+  walletModalOverlay.setAttribute('aria-hidden', 'false');
+}
+
+function closeWalletModal() {
+  walletModalOverlay.classList.remove('open');
+  walletModalOverlay.setAttribute('aria-hidden', 'true');
+}
+
+async function connectWithWallet(wallet: TronWalletProvider) {
   try {
+    if (!wallet.detect()) {
+      if (wallet.id === 'ledger') {
+        openLedgerModalFromWalletList();
+        return;
+      }
+      setStatus(
+        `${wallet.name} not detected. Please install the ${wallet.name} extension and refresh the page.`
+      );
+      return;
+    }
     setStatus('Connecting...');
-    await window.tronLink.request({ method: 'tron_requestAccounts' });
-    const tw = window.tronLink.tronWeb;
+    await wallet.request();
+    const tw = wallet.getTronWeb();
     if (!tw) {
-      setStatus('TronLink not ready. Please unlock and try again.');
+      setStatus(`${wallet.name} not ready. Please unlock and try again.`);
       return;
     }
     tronWeb = tw;
@@ -129,11 +227,28 @@ async function connectWallet() {
     if (addr) {
       ownerEl.value = addr;
     }
-    setStatus('Connected: ' + (addr || 'unknown'));
+    closeWalletModal();
+    setStatus('Connected: ' + (addr || 'unknown') + ' (' + wallet.name + ')');
   } catch (e) {
     setStatus('Connect failed: ' + String(e));
   }
 }
+
+connectBtn.addEventListener('click', openWalletModal);
+walletModalCloseBtn.addEventListener('click', closeWalletModal);
+walletModalOverlay.addEventListener('click', (e) => {
+  if (e.target === walletModalOverlay) closeWalletModal();
+});
+
+ledgerModalCloseBtn.addEventListener('click', closeLedgerModal);
+ledgerModalOverlay.addEventListener('click', (e) => {
+  if (e.target === ledgerModalOverlay) closeLedgerModal();
+});
+ledgerUseTronLinkEl.addEventListener('click', (e) => {
+  e.preventDefault();
+  closeLedgerModal();
+  openWalletModal();
+});
 
 // Sign Permit
 async function signPermit() {
@@ -310,7 +425,6 @@ async function sendPermit() {
   }
 }
 
-connectBtn.addEventListener('click', connectWallet);
 signBtn.addEventListener('click', signPermit);
 sendBtn.addEventListener('click', sendPermit);
 

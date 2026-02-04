@@ -94,10 +94,227 @@
         margin: 0.25rem 0 0;
         border: 1px solid #e2e8f0;
       }
+      .wallet-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+      }
+      .wallet-modal-overlay.open { display: flex; }
+      .wallet-modal {
+        background: #2d2640;
+        color: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      }
+      .wallet-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+      }
+      .wallet-modal-header h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+      .wallet-modal-close {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 0.25rem;
+        line-height: 1;
+        width: auto;
+      }
+      .wallet-modal-close:hover { background: rgba(255,255,255,0.1); border-radius: 6px; }
+      .wallet-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        list-style: none;
+        margin: 0 0 1rem;
+        padding: 0;
+      }
+      .wallet-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(255,255,255,0.08);
+        border-radius: 12px;
+        cursor: pointer;
+        border: 1px solid transparent;
+      }
+      .wallet-item:hover {
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.2);
+      }
+      .wallet-item-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+      .wallet-item-name { font-size: 0.875rem; }
+      .wallet-modal-footer {
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.7);
+        text-align: center;
+        margin-top: 1rem;
+      }
+      .wallet-modal-footer a {
+        color: #a78bfa;
+        text-decoration: none;
+      }
+      .wallet-modal-footer a:hover { text-decoration: underline; }
+      .wallet-empty { text-align: center; color: rgba(255,255,255,0.7); padding: 1rem; }
+
+      /* Ledger login modal (light style like sun.io) */
+      .ledger-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 110;
+        align-items: center;
+        justify-content: center;
+      }
+      .ledger-modal-overlay.open { display: flex; }
+      .ledger-modal {
+        background: #fff;
+        color: #1e293b;
+        border-radius: 12px;
+        overflow: hidden;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      }
+      .ledger-modal-header {
+        background: #374151;
+        color: #fff;
+        padding: 0.75rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .ledger-modal-header h2 { margin: 0; font-size: 1rem; font-weight: 600; }
+      .ledger-modal-close {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.25rem;
+        cursor: pointer;
+        padding: 0.25rem;
+        line-height: 1;
+        width: auto;
+      }
+      .ledger-modal-close:hover { opacity: 0.8; }
+      .ledger-modal-body {
+        padding: 1.5rem;
+        text-align: center;
+      }
+      .ledger-modal-icon {
+        width: 80px;
+        height: 56px;
+        margin: 0 auto 1rem;
+        background: #1f2937;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        font-size: 0.75rem;
+      }
+      .ledger-modal-icon svg {
+        width: 48px;
+        height: 32px;
+        fill: currentColor;
+      }
+      .ledger-modal-instruction {
+        font-size: 0.9rem;
+        color: #374151;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+      }
+      .ledger-modal-spinner {
+        width: 32px;
+        height: 32px;
+        margin: 0 auto 0.5rem;
+        border: 3px solid #e5e7eb;
+        border-top-color: #ef4444;
+        border-radius: 50%;
+        animation: ledger-spin 0.8s linear infinite;
+      }
+      @keyframes ledger-spin { to { transform: rotate(360deg); } }
+      .ledger-modal-status { font-size: 0.875rem; color: #6b7280; }
+      .ledger-modal-error {
+        font-size: 0.875rem;
+        color: #dc2626;
+        margin-top: 0.5rem;
+      }
+      .ledger-modal-footer-note {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 1rem;
+        line-height: 1.4;
+      }
+      .ledger-modal-footer-note a { color: #3b82f6; text-decoration: none; }
+      .ledger-modal-footer-note a:hover { text-decoration: underline; }
     </style>
   </head>
   <body>
-    <h1>Permit2 Demo (TronLink)</h1>
+    <div id="ledgerModalOverlay" class="ledger-modal-overlay" aria-hidden="true">
+      <div class="ledger-modal">
+        <div class="ledger-modal-header">
+          <h2>Log in with Ledger</h2>
+          <button type="button" id="ledgerModalClose" class="ledger-modal-close" aria-label="Close">×</button>
+        </div>
+        <div class="ledger-modal-body">
+          <div class="ledger-modal-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 16" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="22" height="14" rx="1" fill="currentColor" opacity="0.9"/><rect x="3" y="3" width="4" height="2" rx="0.3" fill="#1f2937"/><rect x="8" y="3" width="4" height="2" rx="0.3" fill="#1f2937"/><rect x="13" y="3" width="4" height="2" rx="0.3" fill="#1f2937"/><rect x="18" y="3" width="3" height="2" rx="0.3" fill="#1f2937"/></svg>
+          </div>
+          <p class="ledger-modal-instruction">Please connect to your Ledger device and open "Tron" App.</p>
+          <div id="ledgerModalSpinner" class="ledger-modal-spinner"></div>
+          <p id="ledgerModalStatus" class="ledger-modal-status">Preparing your Ledger device...</p>
+          <p id="ledgerModalError" class="ledger-modal-error" style="display: none;"></p>
+          <p id="ledgerModalFallback" class="ledger-modal-footer-note" style="display: none;">No compatible devices found. <a href="#" id="ledgerUseTronLink">Connect via TronLink</a>, then select TronLink above.</p>
+        </div>
+      </div>
+    </div>
+    <div id="walletModalOverlay" class="wallet-modal-overlay" aria-hidden="true">
+      <div class="wallet-modal">
+        <div class="wallet-modal-header">
+          <h2>Connect Wallet</h2>
+          <button type="button" id="walletModalClose" class="wallet-modal-close" aria-label="Close">×</button>
+        </div>
+        <div id="walletListContainer">
+          <ul id="walletList" class="wallet-list"></ul>
+          <p id="walletEmpty" class="wallet-empty" style="display: none;">No wallet detected. Install TronLink or another Tron wallet.</p>
+        </div>
+        <div class="wallet-modal-footer">
+          Choosing to connect indicates that you have accepted
+          <a href="#" target="_blank" rel="noopener noreferrer">《Terms of Service》</a>
+          and
+          <a href="#" target="_blank" rel="noopener noreferrer">《Privacy Policy》</a>
+        </div>
+      </div>
+    </div>
+    <h1>Permit2 Demo (Tron)</h1>
     <section>
       <label>Network</label>
       <select id="network">
